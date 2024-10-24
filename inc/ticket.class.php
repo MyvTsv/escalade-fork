@@ -90,6 +90,13 @@ class PluginEscaladeTicket
                     $item->input['_do_not_compute_status'] = true;
                     $item->input['status'] = $_SESSION['plugins']['escalade']['config']['ticket_last_status'];
                 }
+                if ($config['remove_group']) {
+                    $old_groups_items_ids = array_column($old_groups, 'items_id');
+                    $new_group_assign = array_filter($item->input["_actors"]["assign"], function ($item) use ($old_groups_items_ids) {
+                        return !in_array($item['items_id'], $old_groups_items_ids);
+                    });
+                    $item->input["_actors"]["assign"] = $new_group_assign;
+                }
                 return PluginEscaladeTicket::addHistoryOnAddGroup($item);
             } else if (count($old_groups) == count($new_groups)) {
                 $old_group_ids = [];
